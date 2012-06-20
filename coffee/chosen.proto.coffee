@@ -17,10 +17,10 @@ class Chosen extends AbstractChosen
     super()
     
     # HTML Templates
-    @single_temp = new Template('<a href="javascript:void(0)" class="chzn-single chzn-default"><span>#{default}</span><div><b></b></div></a><div class="chzn-drop" style="left:-9000px;"><div class="chzn-search"><input type="text" autocomplete="off" /></div><ul class="chzn-results"></ul></div>')
+    @single_temp = new Template('<a href="javascript:void(0)" class="chzn-single chzn-default"><' + @selected_item_tag + '>#{default}</' + @selected_item_tag + '><div><b></b></div></a><div class="chzn-drop" style="left:-9000px;"><div class="chzn-search"><input type="text" autocomplete="off" /></div><ul class="chzn-results"></ul></div>')
     @multi_temp = new Template('<ul class="chzn-choices"><li class="search-field"><input type="text" value="#{default}" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chzn-drop" style="left:-9000px;"><ul class="chzn-results"></ul></div>')
-    @choice_temp = new Template('<li class="search-choice" id="#{id}"><span>#{choice}</span><a href="javascript:void(0)" class="search-choice-close" rel="#{position}"></a></li>')
-    @no_results_temp = new Template('<li class="no-results">' + @results_none_found + ' "<span>#{terms}</span>"</li>')
+    @choice_temp = new Template('<li class="search-choice" id="#{id}"><' + @selected_item_tag + '>#{choice}</' + @selected_item_tag + '><a href="javascript:void(0)" class="search-choice-close" rel="#{position}"></a></li>')
+    @no_results_temp = new Template('<li class="no-results">' + @results_none_found + ' "<' + @selected_item_tag + '>#{terms}</' + @selected_item_tag + '>"</li>')
 
   set_up_html: ->
     @container_id = @form_field.identify().replace(/[^\w]/g, '_') + "_chzn"
@@ -29,7 +29,7 @@ class Chosen extends AbstractChosen
     
     container_props =
       'id': @container_id
-      'class': "chzn-container#{ if @is_rtl then ' chzn-rtl' else '' }"
+      'class': "chzn-container#{ if @is_rtl then ' chzn-rtl' else '' }#{ if @multiline then ' chzn-multiline' else '' }"
       'style': 'width: ' + (@f_width) + 'px' #use parens around @f_width so coffeescript doesn't think + ' px' is a function parameter
     
     base_template = if @is_multiple then new Element('div', container_props).update( @multi_temp.evaluate({ "default": @default_text}) ) else new Element('div', container_props).update( @single_temp.evaluate({ "default":@default_text }) )
@@ -163,7 +163,7 @@ class Chosen extends AbstractChosen
       @search_choices.select("li.search-choice").invoke("remove")
       @choices = 0
     else if not @is_multiple
-      @selected_item.addClassName("chzn-default").down("span").update(@default_text)
+      @selected_item.addClassName("chzn-default").down(@selected_item_tag).update(@default_text)
       if @form_field.options.length <= @disable_search_threshold
         @container.addClassName "chzn-container-single-nosearch"
       else
@@ -178,7 +178,7 @@ class Chosen extends AbstractChosen
         if data.selected and @is_multiple
           this.choice_build data
         else if data.selected and not @is_multiple
-          @selected_item.removeClassName("chzn-default").down("span").update( data.html )
+          @selected_item.removeClassName("chzn-default").down(@selected_item_tag).update( data.html )
           this.single_deselect_control_build() if @allow_single_deselect
 
     this.search_field_disabled()
@@ -314,7 +314,7 @@ class Chosen extends AbstractChosen
 
   results_reset: ->
     @form_field.options[0].selected = true
-    @selected_item.down("span").update(@default_text)
+    @selected_item.down(@selected_item_tag).update(@default_text)
     @selected_item.addClassName("chzn-default") if not @is_multiple
     this.show_search_field_default()
     this.results_reset_cleanup()
@@ -348,7 +348,7 @@ class Chosen extends AbstractChosen
       if @is_multiple
         this.choice_build item
       else
-        @selected_item.down("span").update(item.html)
+        @selected_item.down(@selected_item_tag).update(item.html)
         this.single_deselect_control_build() if @allow_single_deselect
 
       this.results_hide() unless evt.metaKey and @is_multiple
@@ -381,7 +381,7 @@ class Chosen extends AbstractChosen
     this.search_field_scale()
     
   single_deselect_control_build: ->
-    @selected_item.down("span").insert { after: "<abbr class=\"search-choice-close\"></abbr>" } if @allow_single_deselect and not @selected_item.down("abbr")
+    @selected_item.down(@selected_item_tag).insert { after: "<abbr class=\"search-choice-close\"></abbr>" } if @allow_single_deselect and not @selected_item.down("abbr")
 
   winnow_results: ->
     this.no_results_clear()

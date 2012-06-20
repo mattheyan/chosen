@@ -27,12 +27,17 @@ class AbstractChosen
     @results_showing = false
     @result_highlighted = null
     @result_single_selected = null
+    @multiline = @options.multiline || false
+    @selected_item_tag = if @options.multiline then "p" else "span"
     @allow_single_deselect = if @options.allow_single_deselect? and @form_field.options[0]? and @form_field.options[0].text is "" then @options.allow_single_deselect else false
     @disable_search_threshold = @options.disable_search_threshold || 0
     @search_contains = @options.search_contains || false
     @choices = 0
     @single_backstroke_delete = @options.single_backstroke_delete || false
     @max_selected_options = @options.max_selected_options || Infinity
+
+  set_selected_item_tag: ->
+    @selected_item_tag = @options.selected_item_tag || "span"
 
   set_default_text: ->
     if @form_field.getAttribute("data-placeholder")

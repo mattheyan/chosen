@@ -3,6 +3,7 @@
   font-size: 13px;
   position: relative;
   display: inline-block;
+  vertical-align: top;
   zoom: 1;
   *display: inline;
 }
@@ -51,6 +52,10 @@
   color: #444444;
   text-decoration: none;
 }
+.chzn-container-single.chzn-multiline .chzn-single {
+  height: auto;
+  white-space:normal;
+}
 .chzn-container-single .chzn-default {
   color: #999;
 }
@@ -62,6 +67,11 @@
   -o-text-overflow: ellipsis;
   -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
+}
+.chzn-container-single .chzn-single p {
+  padding: 0;
+  margin: 0;
+  margin-right: 25px;
 }
 .chzn-container-single .chzn-single abbr {
   display: block;
