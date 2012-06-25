@@ -129,6 +129,8 @@ Copyright (c) 2011 by Harvest
       this.mouse_on_container = false;
       this.results_showing = false;
       this.result_highlighted = null;
+      this.max_width = this.options.max_width || Infinity;
+      this.min_width = this.options.min_width || 0;
       this.result_single_selected = null;
       this.multiline = this.options.multiline || false;
       this.selected_item_tag = this.options.multiline ? "p" : "span";
@@ -209,6 +211,7 @@ Copyright (c) 2011 by Harvest
       }
       this.result_clear_highlight();
       this.result_single_selected = null;
+      this.reset_dimensions();
       return this.results_build();
     };
 
@@ -324,13 +327,32 @@ Copyright (c) 2011 by Harvest
       return this.no_results_temp = new Template('<li class="no-results">' + this.results_none_found + ' "<' + this.selected_item_tag + '>#{terms}</' + this.selected_item_tag + '>"</li>');
     };
 
+    Chosen.prototype.reset_dimensions = function() {
+      var dd_top, dd_width, sf_width;
+      this.f_width = Math.max(Math.min((this.form_field.getStyle("width") ? parseInt(this.form_field.getStyle("width"), 10) : this.form_field.getWidth()), this.max_width), this.min_width);
+      this.container.setStyle({
+        "width": this.f_width + "px"
+      });
+      dd_top = this.container.getHeight();
+      dd_width = this.f_width - get_side_border_padding(this.dropdown);
+      this.dropdown.setStyle({
+        "width": dd_width + "px"
+      });
+      if (!this.is_multiple) {
+        sf_width = dd_width - get_side_border_padding(this.search_container) - get_side_border_padding(this.search_field);
+        return this.search_field.setStyle({
+          "width": sf_width + "px"
+        });
+      }
+    };
+
     Chosen.prototype.set_up_html = function() {
       var base_template, container_props, dd_top, dd_width, sf_width;
       this.container_id = this.form_field.identify().replace(/[^\w]/g, '_') + "_chzn";
-      this.f_width = this.form_field.getStyle("width") ? parseInt(this.form_field.getStyle("width"), 10) : this.form_field.getWidth();
+      this.f_width = Math.max(Math.min((this.form_field.getStyle("width") ? parseInt(this.form_field.getStyle("width"), 10) : this.form_field.getWidth()), this.max_width), this.min_width);
       container_props = {
         'id': this.container_id,
-        'class': "chzn-container" + (this.is_rtl ? ' chzn-rtl' : ''),
+        'class': "chzn-container" + (this.is_rtl ? ' chzn-rtl' : '') + (this.multiline ? ' chzn-multiline' : ''),
         'style': 'width: ' + this.f_width + 'px'
       };
       base_template = this.is_multiple ? new Element('div', container_props).update(this.multi_temp.evaluate({

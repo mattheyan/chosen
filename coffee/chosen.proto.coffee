@@ -22,10 +22,25 @@ class Chosen extends AbstractChosen
     @choice_temp = new Template('<li class="search-choice" id="#{id}"><' + @selected_item_tag + '>#{choice}</' + @selected_item_tag + '><a href="javascript:void(0)" class="search-choice-close" rel="#{position}"></a></li>')
     @no_results_temp = new Template('<li class="no-results">' + @results_none_found + ' "<' + @selected_item_tag + '>#{terms}</' + @selected_item_tag + '>"</li>')
 
+  reset_dimensions: ->
+    # set field width
+    @f_width = Math.max(Math.min((if @form_field.getStyle("width") then parseInt @form_field.getStyle("width"), 10 else @form_field.getWidth()), @max_width), @min_width)
+    @container.setStyle({"width": @f_width  + "px"})
+
+    # set dropdown dimensions
+    dd_top = @container.getHeight()
+    dd_width = (@f_width - get_side_border_padding(@dropdown))
+    @dropdown.setStyle({"width": dd_width  + "px"})
+
+    # set search field width
+    if not @is_multiple
+      sf_width = dd_width - get_side_border_padding(@search_container) - get_side_border_padding(@search_field)
+      @search_field.setStyle( {"width" : sf_width + "px"} )
+
   set_up_html: ->
     @container_id = @form_field.identify().replace(/[^\w]/g, '_') + "_chzn"
     
-    @f_width = if @form_field.getStyle("width") then parseInt @form_field.getStyle("width"), 10 else @form_field.getWidth()
+    @f_width = Math.max(Math.min((if @form_field.getStyle("width") then parseInt @form_field.getStyle("width"), 10 else @form_field.getWidth()), @max_width), @min_width)
     
     container_props =
       'id': @container_id

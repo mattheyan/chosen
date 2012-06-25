@@ -25,11 +25,26 @@ class Chosen extends AbstractChosen
   finish_setup: ->
     @form_field_jq.addClass "chzn-done"
 
+  reset_dimensions: ->
+    # set field width
+    @f_width = Math.max(Math.min(@form_field_jq.outerWidth(), @max_width), @min_width)
+    @container.css('width', @f_width + 'px')
+
+    # set dropdown dimensions
+    dd_top = @container.height()
+    dd_width = (@f_width - get_side_border_padding(@dropdown))
+    @dropdown.css({"width": dd_width  + "px", "top": dd_top + "px"})
+
+    # set search field width
+    if not @is_multiple
+      sf_width = dd_width - get_side_border_padding(@search_container) - get_side_border_padding(@search_field)
+      @search_field.css( {"width" : sf_width + "px"} )
+
   set_up_html: ->
     @container_id = if @form_field.id.length then @form_field.id.replace(/[^\w]/g, '_') else this.generate_field_id()
     @container_id += "_chzn"
 
-    @f_width = @form_field_jq.outerWidth()
+    @f_width = Math.max(Math.min(@form_field_jq.outerWidth(), @max_width), @min_width)
 
     container_div = ($ "<div />", {
       id: @container_id

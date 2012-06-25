@@ -26,6 +26,8 @@ class AbstractChosen
     @mouse_on_container = false
     @results_showing = false
     @result_highlighted = null
+    @max_width = @options.max_width || Infinity
+    @min_width = @options.min_width || 0
     @result_single_selected = null
     @multiline = @options.multiline || false
     @selected_item_tag = if @options.multiline then "p" else "span"
@@ -79,6 +81,7 @@ class AbstractChosen
     this.results_reset_cleanup() if not @is_multiple
     this.result_clear_highlight()
     @result_single_selected = null
+    this.reset_dimensions()
     this.results_build()
 
   results_toggle: ->

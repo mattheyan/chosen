@@ -129,6 +129,8 @@ Copyright (c) 2011 by Harvest
       this.mouse_on_container = false;
       this.results_showing = false;
       this.result_highlighted = null;
+      this.max_width = this.options.max_width || Infinity;
+      this.min_width = this.options.min_width || 0;
       this.result_single_selected = null;
       this.multiline = this.options.multiline || false;
       this.selected_item_tag = this.options.multiline ? "p" : "span";
@@ -209,6 +211,7 @@ Copyright (c) 2011 by Harvest
       }
       this.result_clear_highlight();
       this.result_single_selected = null;
+      this.reset_dimensions();
       return this.results_build();
     };
 
@@ -334,11 +337,29 @@ Copyright (c) 2011 by Harvest
       return this.form_field_jq.addClass("chzn-done");
     };
 
+    Chosen.prototype.reset_dimensions = function() {
+      var dd_top, dd_width, sf_width;
+      this.f_width = Math.max(Math.min(this.form_field_jq.outerWidth(), this.max_width), this.min_width);
+      this.container.css('width', this.f_width + 'px');
+      dd_top = this.container.height();
+      dd_width = this.f_width - get_side_border_padding(this.dropdown);
+      this.dropdown.css({
+        "width": dd_width + "px",
+        "top": dd_top + "px"
+      });
+      if (!this.is_multiple) {
+        sf_width = dd_width - get_side_border_padding(this.search_container) - get_side_border_padding(this.search_field);
+        return this.search_field.css({
+          "width": sf_width + "px"
+        });
+      }
+    };
+
     Chosen.prototype.set_up_html = function() {
       var container_div, dd_top, dd_width, sf_width;
       this.container_id = this.form_field.id.length ? this.form_field.id.replace(/[^\w]/g, '_') : this.generate_field_id();
       this.container_id += "_chzn";
-      this.f_width = this.form_field_jq.outerWidth();
+      this.f_width = Math.max(Math.min(this.form_field_jq.outerWidth(), this.max_width), this.min_width);
       container_div = $("<div />", {
         id: this.container_id,
         "class": "chzn-container" + (this.is_rtl ? ' chzn-rtl' : '') + (this.multiline ? ' chzn-multiline' : ''),
