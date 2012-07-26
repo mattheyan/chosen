@@ -30,6 +30,11 @@ class Chosen extends AbstractChosen
     @f_width = Math.max(Math.min(@form_field_jq.outerWidth(), @max_width), @min_width)
     @container.css('width', @f_width + 'px')
 
+    if this.show_single_deselect()
+      @container.addClass('chzn-single-deselect')
+    else
+      @container.removeClass('chzn-single-deselect')
+
     # set dropdown dimensions
     dd_top = @container.height()
     dd_width = (@f_width - get_side_border_padding(@dropdown))
@@ -48,7 +53,7 @@ class Chosen extends AbstractChosen
 
     container_div = ($ "<div />", {
       id: @container_id
-      class: "chzn-container#{ if @is_rtl then ' chzn-rtl' else '' }#{ if @multiline then ' chzn-multiline' else '' }"
+      class: "chzn-container#{ if @is_rtl then ' chzn-rtl' else '' }#{ if @multiline then ' chzn-multiline' else '' }#{ if this.show_single_deselect() then ' chzn-single-deselect' else '' }"
       style: 'width: ' + (@f_width) + 'px;' #use parens around @f_width so coffeescript doesn't think + ' px' is a function parameter
     })
 
@@ -203,7 +208,7 @@ class Chosen extends AbstractChosen
           this.choice_build data
         else if data.selected and not @is_multiple
           @selected_item.removeClass("chzn-default").find(@selected_item_tag).text data.text
-          this.single_deselect_control_build() if @allow_single_deselect
+          this.single_deselect_control_build()
 
     this.search_field_disabled()
     this.show_search_field_default()
@@ -336,12 +341,14 @@ class Chosen extends AbstractChosen
     link.parents('li').first().remove()
 
   results_reset: ->
-    @form_field.options[0].selected = true
+    first_option = @form_field.options[0]
+    first_option.selected = true
     @selected_item.find(@selected_item_tag).text @default_text
     @selected_item.addClass("chzn-default") if not @is_multiple
     this.show_search_field_default()
     this.results_reset_cleanup()
     @form_field_jq.trigger "change"
+    @form_field_jq.trigger("liszt:selection_change", {chosen: this, selected: first_option})
     this.results_hide() if @active_field
   
   results_reset_cleanup: ->
@@ -373,13 +380,15 @@ class Chosen extends AbstractChosen
         this.choice_build item
       else
         @selected_item.find(@selected_item_tag).first().text item.text
-        this.single_deselect_control_build() if @allow_single_deselect
+        this.single_deselect_control_build()
 
       this.results_hide() unless evt.metaKey and @is_multiple
 
       @search_field.val ""
 
-      @form_field_jq.trigger "change", {'selected': @form_field.options[item.options_index].value} if @is_multiple || @form_field_jq.val() != @current_value
+      selected = @form_field.options[item.options_index].value if @is_multiple || @form_field_jq.val() != @current_value
+      @form_field_jq.trigger "change", {'selected': selected} if @is_multiple || @form_field_jq.val() != @current_value
+      @form_field_jq.trigger("liszt:selection_change", {chosen: this, selected: (selected if @is_multiple || @form_field_jq.val() != @current_value)})
       @current_value = @form_field_jq.val()
       this.search_field_scale()
 
@@ -401,10 +410,11 @@ class Chosen extends AbstractChosen
     this.winnow_results()
 
     @form_field_jq.trigger "change", {deselected: @form_field.options[result_data.options_index].value}
+    @form_field_jq.trigger("liszt:selection_change", {chosen: this, selected: null})
     this.search_field_scale()
 
   single_deselect_control_build: ->
-    @selected_item.find(@selected_item_tag).first().after "<abbr class=\"search-choice-close\"></abbr>" if @allow_single_deselect and @selected_item.find("abbr").length < 1
+    @selected_item.find(@selected_item_tag).first().after "<abbr class=\"search-choice-close\"></abbr>" if this.show_single_deselect() and @selected_item.find("abbr").length < 1
 
   winnow_results: ->
     this.no_results_clear()

@@ -134,12 +134,16 @@ Copyright (c) 2011 by Harvest
       this.result_single_selected = null;
       this.multiline = this.options.multiline || false;
       this.selected_item_tag = this.options.multiline ? "p" : "span";
-      this.allow_single_deselect = (this.options.allow_single_deselect != null) && (this.form_field.options[0] != null) && this.form_field.options[0].text === "" ? this.options.allow_single_deselect : false;
+      this.allow_single_deselect = this.options.allow_single_deselect != null ? this.options.allow_single_deselect : false;
       this.disable_search_threshold = this.options.disable_search_threshold || 0;
       this.search_contains = this.options.search_contains || false;
       this.choices = 0;
       this.single_backstroke_delete = this.options.single_backstroke_delete || false;
       return this.max_selected_options = this.options.max_selected_options || Infinity;
+    };
+
+    AbstractChosen.prototype.show_single_deselect = function() {
+      return this.allow_single_deselect && (this.form_field.options[0] != null) && this.form_field.options[0].text === "";
     };
 
     AbstractChosen.prototype.set_selected_item_tag = function() {

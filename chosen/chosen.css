@@ -73,6 +73,9 @@
   margin: 0;
   margin-right: 25px;
 }
+.chzn-single-deselect.chzn-container-single .chzn-single p {
+  margin-right: 40px;
+}
 .chzn-container-single .chzn-single abbr {
   display: block;
   position: absolute;
