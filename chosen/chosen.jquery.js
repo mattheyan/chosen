@@ -800,7 +800,7 @@ Copyright (c) 2011 by Harvest
         if (this.is_multiple) {
           this.choice_build(item);
         } else {
-          this.selected_item.find(this.selected_item_tag).first().text(item.text);
+          this.selected_item.find(this.selected_item_tag).first().html(item.html);
           this.single_deselect_control_build();
         }
         if (!(evt.metaKey && this.is_multiple)) {

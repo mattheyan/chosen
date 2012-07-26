@@ -379,7 +379,7 @@ class Chosen extends AbstractChosen
       if @is_multiple
         this.choice_build item
       else
-        @selected_item.find(@selected_item_tag).first().text item.text
+        @selected_item.find(@selected_item_tag).first().html item.html
         this.single_deselect_control_build()
 
       this.results_hide() unless evt.metaKey and @is_multiple
